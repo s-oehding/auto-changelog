@@ -2,12 +2,14 @@ const parseRepoURL = require('parse-github-url')
 const { cmd } = require('./utils')
 
 async function fetchRemote (options) {
+  console.log(options)
   const remoteURL = await cmd(`git config --get remote.${options.remote}.url`)
   return getRemote(remoteURL, options)
 }
 
 function getRemote (remoteURL, options = {}) {
   const overrides = getOverrides(options)
+
   if (!remoteURL) {
     // No point warning if everything is overridden
     if (Object.keys(overrides).length !== 4) {
@@ -26,6 +28,7 @@ function getRemote (remoteURL, options = {}) {
   const hostname = remote.hostname || remote.host
 
   const IS_BITBUCKET = /bitbucket/.test(hostname)
+  const IS_BITBUCKET_SERVER = overrides.hasOwnProperty('bitbucket-server-url')
   const IS_GITLAB = /gitlab/.test(hostname)
   const IS_GITLAB_SUBGROUP = /\.git$/.test(remote.branch)
   const IS_AZURE = /dev\.azure/.test(hostname)
@@ -38,6 +41,17 @@ function getRemote (remoteURL, options = {}) {
       getIssueLink: id => `${url}/issues/${id}`,
       getMergeLink: id => `${url}/pull-requests/${id}`,
       getCompareLink: (from, to) => `${url}/compare/${to}..${from}`,
+      ...overrides
+    }
+  }
+
+  if (IS_BITBUCKET_SERVER) {
+    const url = `${protocol}//${hostname}/${remote.repo}`
+    return {
+      getCommitLink: id => `${url}/commits/${id}`,
+      getIssueLink: id => `${url}/issues/${id}`,
+      getMergeLink: id => `${url}/pull-requests/${id}`,
+      getCompareLink: (from, to) => `${url}/compare/diff?targetBranch=refs/tags/${from}&sourceBranch=refs/tags/${to}`,
       ...overrides
     }
   }

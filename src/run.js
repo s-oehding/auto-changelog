@@ -33,6 +33,7 @@ async function getOptions (argv) {
     .option('-u, --unreleased', 'include section for unreleased changes')
     .option('-l, --commit-limit <count>', `number of commits to display per release, default: ${DEFAULT_OPTIONS.commitLimit}`, parseLimit)
     .option('-b, --backfill-limit <count>', `number of commits to backfill empty releases with, default: ${DEFAULT_OPTIONS.backfillLimit}`, parseLimit)
+    .option('--bitbucket-server-url', 'custom baseUrl if you are using selfhosted Bitbucket Server (formerly atlassian stash) instances')
     .option('--commit-url <url>', 'override url for commits, use {id} for commit id')
     .option('-i, --issue-url <url>', 'override url for issues, use {id} for issue id') // -i kept for back compatibility
     .option('--merge-url <url>', 'override url for merges, use {id} for merge id')

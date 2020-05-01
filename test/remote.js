@@ -106,6 +106,18 @@ describe('fetchRemote', () => {
     }
   }
 
+  it('supports bitbucket server overrides', async () => {
+    mock('cmd', () => '')
+    const result = await fetchRemote({
+      bitbucketServerUrl: 'https://bitbucket-server.com'
+    })
+    expect(result.getCommitLink('123')).to.equal('https://bitbucket-server.com/commits/123')
+    expect(result.getIssueLink('123')).to.equal('https://bitbucket-server.com/issue/123')
+    expect(result.getMergeLink('123')).to.equal('https://bitbucket-server.com/merge/123')
+    expect(result.getCompareLink('v1.2.3', 'v2.0.0')).to.equal('https://bitbucket-server.com/compare/diff?targetBranch=refs/tags/v1.2.3&sourceBranch=refs/tags/v2.0.0')
+    unmock('cmd')
+  })
+
   it('supports overrides', async () => {
     mock('cmd', () => '')
     const result = await fetchRemote({
